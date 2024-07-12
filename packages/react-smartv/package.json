@@ -1,0 +1,45 @@
+{
+  "name": "react-smartv",
+  "version": "0.0.0",
+  "description": "React Render to build interfaces using Lightning",
+  "license": "MIT",
+  "type": "module",
+  "source": "src/index.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "jsx-runtime.d.ts",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "peerDependencies": {
+    "@lightningjs/renderer": "^0.9.4",
+    "react": "^18.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lmelati/react-smartv.git"
+  },
+  "keywords": [
+    "react",
+    "smartv",
+    "renderer",
+    "canvas",
+    "WebGL",
+    "tv",
+    "lightning"
+  ],
+  "author": "Leonardo Melati <leonardomelati@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/lmelati/react-smartv/issues"
+  },
+  "homepage": "https://github.com/lmelati/react-smartv#readme"
+}
