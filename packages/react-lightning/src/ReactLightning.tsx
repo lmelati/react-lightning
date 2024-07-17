@@ -33,6 +33,8 @@ async function init(rootId: string | HTMLElement, settings?: RendererSettings) {
     <LightningContext.Provider value={lightning}>{children}</LightningContext.Provider>
   );
 
+  console.log('mode', lightning.stage.renderer.mode);
+
   const defaultFontManager = new WebTrFontFace({
     fontFamily: 'Roboto',
     fontUrl: robotoFontUrl,

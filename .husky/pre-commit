@@ -1,0 +1,24 @@
+#!/bin/sh
+[ -n "$CI" ] && exit 0
+# shellcheck source=/dev/null
+. "$(dirname -- "$0")/_/husky.sh"
+
+FILE_ENV=.env
+if [ -f "$FILE_ENV" ]; then
+    # shellcheck disable=SC2046
+    [ ! -f "$FILE_ENV" ] || export $(grep -v '^#' $FILE_ENV | xargs)
+fi
+
+# shellcheck disable=SC3010
+# shellcheck disable=SC2009
+if ps -o args= $PPID | grep -E -q ' --no-verify| -n | -n$' ; then
+    exit 0
+fi
+
+if [ "$HUSKY" = "0" ]; then
+    exit 0
+fi
+
+if [ ! "$HUSKY__PRE_COMMIT__LINT_STAGED" = "0" ]; then
+  npx lint-staged
+fi
