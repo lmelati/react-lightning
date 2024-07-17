@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://reactnative.dev/">
+  <a href="#">
     React Lightning
   </a>
 </h1>
