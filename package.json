@@ -17,7 +17,7 @@
   "scripts": {
     "clean": "rimraf package-lock.json && rimraf '**/node_modules'",
     "build": "lerna run --parallel build",
-    "prepare": "is-ci || husky install"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
