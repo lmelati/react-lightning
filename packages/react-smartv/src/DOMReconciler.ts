@@ -147,15 +147,10 @@ const hostConfig: HostConfig<
     _internalInstanceHandle: any,
     keepChildren: boolean
   ): NodeElement<any> {
-    console.log('CAINDO AQUI?');
-    // TODO implement a way where we can create a new instance and reuse the underlying canvaskit objects where possible
-
     const ckElement = createNode(type, newProps);
     if (keepChildren && isContainerElement(ckElement) && isContainerElement(instance)) {
       ckElement.children = instance.children;
     }
-    // recyclableInstance.props = newProps
-    // return recyclableInstance
     return ckElement;
   },
 

@@ -73,15 +73,19 @@ function render(element: React.ReactNode, callback?: () => void) {
     props: {
       width: lightningRenderer.root.width,
       height: lightningRenderer.root.height,
-      color: 0xff0000ff,
     },
     rendered: false,
     children: [],
     node: null,
     render: () => {
-      console.log('CAINDO AQUI???');
+      rootNode.node = lightningRenderer?.createNode({
+        parent: lightningRenderer.root,
+        ...rootNode.props,
+      });
     },
   };
+
+  rootNode.render(rootNode);
 
   const container = DOMReconciler.createContainer(rootNode, ConcurrentRoot, null, false, null, '', console.error, null);
 
