@@ -2,41 +2,41 @@ import reconciler, { type HostConfig } from 'react-reconciler';
 import { DefaultEventPriority } from 'react-reconciler/constants';
 
 import {
-  createNode,
-  type NodeElementContainer,
-  type NodeElement,
-  type NodeProps,
-  type NodeType,
   isContainerElement,
-} from './types/NodeType';
+  type ElementType,
+  type Element,
+  type ElementProps,
+  type ElementContainer,
+  createElement,
+} from './types';
 
 type ContainerContext = {
-  node: NodeElement<any>;
+  element: Element<any>;
 };
 
 const hostConfig: HostConfig<
-  NodeType, // Type
-  NodeProps<any>, // Props
-  NodeElementContainer<any>, // Container
-  NodeElement<any>, // Instance
-  NodeElement<'tv-text'>, // TextInstance
+  ElementType, // Type
+  ElementProps<any>, // Props
+  ElementContainer<any>, // Container
+  Element<any>, // Instance
+  Element<'ln-text'>, // TextInstance
   any, // SuspenceInstance
   any, // HydratableInstance
   any, // PublicInstance
   ContainerContext, // HostContext
   any, // UpdatePayload
-  NodeElement<any>[], // _ChildSet
+  Element<any>[], // _ChildSet
   any, // TimeoutHandle
   any // NoTimout
 > = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
+  // @ts-ignore
   now: Date.now,
   supportsMutation: false,
   supportsHydration: false,
   supportsPersistence: true,
 
-  createContainerChildSet(): NodeElement<any>[] {
+  createContainerChildSet(): Element<any>[] {
     return [];
   },
 
@@ -45,10 +45,10 @@ const hostConfig: HostConfig<
    * @param childSet
    * @param child
    */
-  appendChildToContainerChildSet(childSet: NodeElement<any>[], child: NodeElement<any>) {
+  appendChildToContainerChildSet(childSet: Element<any>[], child: Element<any>) {
     childSet.push(child);
   },
-  replaceContainerChildren(container: NodeElementContainer<any>, newChildren: NodeElement<any>[]) {
+  replaceContainerChildren(container: ElementContainer<any>, newChildren: Element<any>[]) {
     // container.children.forEach((child) => child.delete())
     container.children = newChildren;
   },
@@ -67,7 +67,7 @@ const hostConfig: HostConfig<
    * @return A context object that you wish to pass to immediate child.
    */
   getRootHostContext(rootContainerInstance): ContainerContext {
-    return { node: rootContainerInstance };
+    return { element: rootContainerInstance };
   },
 
   /**
@@ -93,17 +93,17 @@ const hostConfig: HostConfig<
     return parentHostContext;
   },
 
-  createTextInstance(text): NodeElement<'tv-text'> {
-    throw new Error(`The text '${text}' must be wrapped in a tv-text element.`);
+  createTextInstance(text): Element<'ln-text'> {
+    throw new Error(`The text '${text}' must be wrapped in a ln-text element.`);
   },
 
   shouldSetTextContent: (type): boolean => {
-    return type === 'tv-text';
+    return type === 'ln-text';
   },
 
   // Create the DOMElement, but attributes are set in `finalizeInitialChildren`
   createInstance(type, props) {
-    return createNode(type, props);
+    return createElement(type, props);
   },
 
   appendInitialChild: (parentInstance, child) => {
@@ -130,7 +130,7 @@ const hostConfig: HostConfig<
     containerInfo.props.renderCallback?.();
   },
 
-  getPublicInstance(instance: NodeElement<any> | NodeElement<'tv-text'>) {
+  getPublicInstance(instance: Element<any> | Element<'ln-text'>) {
     return instance;
   },
 
@@ -139,15 +139,15 @@ const hostConfig: HostConfig<
   },
 
   cloneInstance(
-    instance: NodeElement<any>,
+    instance: Element<any>,
     _updatePayload: any,
-    type: NodeType,
-    _oldProps: NodeProps<any>,
-    newProps: NodeProps<any>,
+    type: ElementType,
+    _oldProps: ElementProps<any>,
+    newProps: ElementProps<any>,
     _internalInstanceHandle: any,
     keepChildren: boolean
-  ): NodeElement<any> {
-    const ckElement = createNode(type, newProps);
+  ): Element<any> {
+    const ckElement = createElement(type, newProps);
     if (keepChildren && isContainerElement(ckElement) && isContainerElement(instance)) {
       ckElement.children = instance.children;
     }

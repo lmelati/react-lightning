@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ConcurrentRoot } from 'react-reconciler/constants';
 import { DOMReconciler } from './DOMReconciler';
 import { type RendererSettings, startLightningRenderer } from './Lightning';
-import type { NodeElementContainer } from './types/NodeType';
+import type { ElementContainer } from './types';
 
 import { RendererMain, WebTrFontFace } from '@lightningjs/renderer';
 
@@ -68,8 +68,8 @@ function render(element: React.ReactNode, callback?: () => void) {
     throw new Error('Lightning renderer not initialized. Call `init` before calling `render`.');
   }
 
-  const rootNode: NodeElementContainer<'tv-view'> = {
-    type: 'tv-view',
+  const rootNode: ElementContainer<'ln-view'> = {
+    type: 'ln-view',
     props: {
       width: lightningRenderer.root.width,
       height: lightningRenderer.root.height,
@@ -78,6 +78,7 @@ function render(element: React.ReactNode, callback?: () => void) {
     children: [],
     node: null,
     render: () => {
+      // Insert the root node into the lightning renderer
       rootNode.node = lightningRenderer?.createNode({
         parent: lightningRenderer.root,
         ...rootNode.props,
@@ -85,6 +86,7 @@ function render(element: React.ReactNode, callback?: () => void) {
     },
   };
 
+  // Render the root node
   rootNode.render(rootNode);
 
   const container = DOMReconciler.createContainer(rootNode, ConcurrentRoot, null, false, null, '', console.error, null);

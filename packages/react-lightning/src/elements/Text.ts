@@ -1,26 +1,26 @@
 import type { INode, ITextNodeProps } from '@lightningjs/renderer';
 import { renderer } from '../Lightning';
-import type { NodeCreator, NodeElement, NodeElementContainer, NodeProps, ObjectTyping } from '../types/NodeType';
-import { isTvView } from './TvView';
+import type { Element, ElementContainer, ElementCreator, ElementProps, ObjectTyping } from '../types';
+import { isView } from './View';
 
-export interface TvTextProps extends NodeProps<Partial<ITextNodeProps>> {
+export interface TextProps extends ElementProps<Partial<ITextNodeProps>> {
   children: string;
 }
 
-export class TvText implements NodeElement<'tv-text'> {
-  readonly type = 'tv-text' as const;
-  readonly props: ObjectTyping['tv-text']['props'];
+export class Text implements Element<'ln-text'> {
+  readonly type = 'ln-text' as const;
+  readonly props: ObjectTyping['ln-text']['props'];
 
   rendered: boolean;
   node: INode<any> | null | undefined;
 
-  constructor(props: ObjectTyping['tv-text']['props']) {
+  constructor(props: ObjectTyping['ln-text']['props']) {
     this.props = props;
     this.rendered = false;
   }
 
-  render(parent?: NodeElementContainer<any>): void {
-    if (!parent || !isTvView(parent)) {
+  render(parent?: ElementContainer<any>): void {
+    if (!parent || !isView(parent)) {
       console.warn('Parent is not a TvView');
       return;
     }
@@ -47,4 +47,4 @@ export class TvText implements NodeElement<'tv-text'> {
   }
 }
 
-export const createTvText: NodeCreator<'tv-text'> = (_, props) => new TvText(props);
+export const createText: ElementCreator<'ln-text'> = (_, props) => new Text(props);

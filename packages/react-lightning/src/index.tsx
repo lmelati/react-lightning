@@ -1,5 +1,5 @@
 export type { RendererSettings } from './Lightning';
-export type * from './types/NodeType';
+export type * from './types';
 
 export * from './ReactLightning';
-export { TvView, TvText } from './nodes';
+export { View, Text } from './elements';
