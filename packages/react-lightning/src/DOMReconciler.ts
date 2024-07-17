@@ -162,7 +162,7 @@ const DOMReconciler = reconciler(hostConfig);
 DOMReconciler.injectIntoDevTools({
   bundleType: 1, // __DEV__ ? 1 : 0
   version: '0.1.0',
-  rendererPackageName: 'react-smartv',
+  rendererPackageName: 'react-lightning',
 });
 
 export { DOMReconciler };

@@ -1,5 +1,5 @@
 export type { RendererSettings } from './Lightning';
 export type * from './types/NodeType';
 
-export * from './ReactSmarTV';
+export * from './ReactLightning';
 export { TvView, TvText } from './nodes';

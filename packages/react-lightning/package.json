@@ -1,5 +1,5 @@
 {
-  "name": "react-smartv",
+  "name": "react-lightning",
   "version": "0.0.0",
   "description": "React Render to build interfaces using Lightning",
   "license": "MIT",
@@ -56,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lmelati/react-smartv.git"
+    "url": "git+https://github.com/lmelati/react-lightning.git"
   },
   "keywords": [
     "react",
@@ -69,7 +69,7 @@
   ],
   "author": "Leonardo Melati <leonardomelati@gmail.com>",
   "bugs": {
-    "url": "https://github.com/lmelati/react-smartv/issues"
+    "url": "https://github.com/lmelati/react-lightning/issues"
   },
-  "homepage": "https://github.com/lmelati/react-smartv#readme"
+  "homepage": "https://github.com/lmelati/react-lightning#readme"
 }

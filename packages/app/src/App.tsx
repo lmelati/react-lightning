@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react'
-import { TvView } from 'react-smartv';
+import { TvView } from 'react-lightning';
 import './App.css'
 import React from 'react';
 

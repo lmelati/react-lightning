@@ -25,8 +25,8 @@ const getBaseConfig = ({ plugins = [react()], lib }) =>
 
 export default getBaseConfig({
   lib: {
-    entry: path.resolve(__dirname, "../react-smartv/dist/index.js"),
-    name: "ReactSmarTV",
-    fileName: "react-smartv",
+    entry: path.resolve(__dirname, "../react-lightning/dist/index.js"),
+    name: "React Lightning",
+    fileName: "react-lighhtning",
   },
 });

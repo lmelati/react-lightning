@@ -1,4 +1,4 @@
-import { init, render, type RendererSettings } from 'react-smartv';
+import { init, render, type RendererSettings } from 'react-lightning';
 import App from './App';
 import './index.css';
 
