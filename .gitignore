@@ -11,5 +11,3 @@ npm-shrinkwrap.json
 # Docusaurus
 lib/core/metadata.js
 lib/core/MetadataBlog.js
-
-.vscode/

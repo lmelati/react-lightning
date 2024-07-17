@@ -1,5 +1,4 @@
 {
-  "name": "root",
   "private": true,
   "author": "Leonardo Melati <leonardomelati@gmail.com>",
   "license": "MIT",
@@ -14,9 +13,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "clean": "rm -rf ./node_modules || true"
+  },
   "devDependencies": {
-    "lerna": "^8.1.6",
-    "react": "^18.3.1",
-    "react-reconciler": "^0.29.2"
+    "lerna": "^8.1.6"
   }
 }
