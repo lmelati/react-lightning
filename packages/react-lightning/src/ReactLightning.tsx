@@ -4,17 +4,18 @@ import { DOMReconciler } from './DOMReconciler';
 import { type RendererSettings, startLightningRenderer } from './Lightning';
 import type { ElementContainer } from './types';
 
-import { RendererMain, WebTrFontFace } from '@lightningjs/renderer';
+import { RendererMain, SdfTrFontFace, TrFontFace, WebTrFontFace } from '@lightningjs/renderer';
+import type { fontData } from './types/LightningFonts';
 
 let lightningRenderer: RendererMain | undefined;
 let LightningContext: React.Context<RendererMain>;
 let LightningProvider: React.FunctionComponent;
 let useLightning: () => RendererMain;
 
-let FontManagerContext: React.Context<WebTrFontFace>;
+let FontManagerContext: React.Context<WebTrFontFace | SdfTrFontFace<any> | any>;
 let useFontManager: () => void;
 let FontManagerProvider: React.FunctionComponent<{
-  fontData: ArrayBuffer[] | undefined;
+  fontData: fontData | undefined;
   children?: React.ReactNode;
 }>;
 
@@ -22,7 +23,6 @@ async function init(rootId: string | HTMLElement, settings?: RendererSettings) {
   const rootElement = typeof rootId === 'string' ? document.getElementById(rootId)! : rootId;
 
   lightningRenderer = startLightningRenderer(settings, rootElement);
-  const robotoFontUrl = 'https://storage.googleapis.com/skia-cdn/misc/Roboto-Regular.ttf';
   const lightning = lightningRenderer;
 
   LightningContext = React.createContext(lightning);
@@ -33,35 +33,30 @@ async function init(rootId: string | HTMLElement, settings?: RendererSettings) {
     <LightningContext.Provider value={lightning}>{children}</LightningContext.Provider>
   );
 
-  console.log('mode', lightning.stage.renderer.mode);
-
-  const defaultFontManager = new WebTrFontFace({
-    fontFamily: 'Roboto',
-    fontUrl: robotoFontUrl,
-    descriptors: {},
-  });
-
-  lightning.stage.fontManager.addFontFace(defaultFontManager);
-
-  FontManagerContext = React.createContext(defaultFontManager);
+  FontManagerContext = React.createContext(undefined);
   useFontManager = () => React.useContext(FontManagerContext);
   // eslint-disable-next-line react/display-name
-  FontManagerProvider = (props: { fontData?: ArrayBuffer[]; children?: React.ReactNode }) => {
-    return <FontManagerContext.Provider value={defaultFontManager}>{props.children}</FontManagerContext.Provider>;
-    // if (props.fontData) {
-    //   const fontMgrFromData = ck.FontMgr.FromData(...props.fontData);
-    //   if (fontMgrFromData === null) {
-    //     throw new Error('Failed to create font manager from font data.');
-    //   }
+  FontManagerProvider = (props: { fontData: fontData | undefined; children?: React.ReactNode }) => {
+    let fontManager!: TrFontFace;
 
-    //   return (
-    //     <FontManagerContext.Provider value={fontMgrFromData}>
-    //       {props.children}
-    //     </FontManagerContext.Provider>
-    //   );
-    // } else {
+    if (props.fontData) {
+      if (!lightningRenderer?.stage) {
+        throw new Error("Lightning renderer's stage not initialized.");
+      }
 
-    // }
+      if (props.fontData.mode === 'webgl') {
+        fontManager = new SdfTrFontFace(props.fontData.type, {
+          stage: lightningRenderer?.stage,
+          ...props.fontData.options,
+        });
+      } else {
+        fontManager = new WebTrFontFace(props.fontData);
+      }
+
+      lightning.stage.fontManager.addFontFace(fontManager);
+    }
+
+    return <FontManagerContext.Provider value={fontManager}>{props.children}</FontManagerContext.Provider>;
   };
 }
 
