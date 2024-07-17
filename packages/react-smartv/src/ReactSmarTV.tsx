@@ -41,8 +41,6 @@ async function init(rootId: string | HTMLElement, settings?: RendererSettings) {
 
   lightning.stage.fontManager.addFontFace(defaultFontManager);
 
-  console.log('defaultFontManager', defaultFontManager);
-
   FontManagerContext = React.createContext(defaultFontManager);
   useFontManager = () => React.useContext(FontManagerContext);
   // eslint-disable-next-line react/display-name
