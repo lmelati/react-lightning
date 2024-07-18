@@ -67,23 +67,24 @@ function render(element: React.ReactNode, callback?: () => void) {
 
   const rootNode: ElementContainer<'ln-view'> = {
     type: 'ln-view',
-    props: {
-      width: lightningRenderer.root.width,
-      height: lightningRenderer.root.height,
-    },
-    rendered: false,
+    props: {},
     children: [],
-    node: null,
+    node: undefined,
     render: () => {
-      // Insert the root node into the lightning renderer
-      rootNode.node = lightningRenderer?.createNode({
+      if (!lightningRenderer) return;
+
+      // Create the root node
+      rootNode.node = lightningRenderer.createNode({
         parent: lightningRenderer.root,
-        ...rootNode.props,
+        width: lightningRenderer.root.width,
+        height: lightningRenderer.root.height,
       });
+    },
+    delete: () => {
+      rootNode.delete();
     },
   };
 
-  // Render the root node
   rootNode.render(rootNode);
 
   const container = DOMReconciler.createContainer(rootNode, ConcurrentRoot, null, false, null, '', console.error, null);

@@ -1,49 +1,53 @@
-import type { INode, ITextNodeProps } from '@lightningjs/renderer';
+import type { ITextNode } from '@lightningjs/renderer';
 import { renderer } from '../Lightning';
-import type { Element, ElementContainer, ElementCreator, ElementProps, ObjectTyping } from '../types';
+import type { Element, ElementContainer, ElementCreator, ElementProps, ObjectTyping, TextStyle } from '../types';
 import { isView } from './View';
+import { isTextNode } from '../utils';
+import { toLightningTextNode } from '../LightningElementMapping';
 
-export interface TextProps extends ElementProps<Partial<ITextNodeProps>> {
+export interface TextProps extends TextStyle, ElementProps<Text> {
   children: string;
 }
 
 export class Text implements Element<'ln-text'> {
   readonly type = 'ln-text' as const;
   readonly props: ObjectTyping['ln-text']['props'];
+  node: ITextNode | undefined;
 
-  rendered: boolean;
-  node: INode<any> | null | undefined;
+  rendered = false;
+  deleted = false;
 
   constructor(props: ObjectTyping['ln-text']['props']) {
     this.props = props;
-    this.rendered = false;
   }
 
   render(parent?: ElementContainer<any>): void {
     if (!parent || !isView(parent)) {
-      console.warn('Parent is not a TvView');
-      return;
+      throw new Error('Parent is not a view');
     }
 
     if (!parent.rendered) {
-      console.warn('Parent not rendered yet:', this);
-      return;
+      throw new Error('Parent not rendered');
     }
 
-    if (this.rendered) {
-      console.warn('Text already rendered:', this);
-      return;
-    }
+    const lightningTextNodeBuilder = toLightningTextNode(this.props);
 
     this.node = renderer.createTextNode({
-      color: 0xffffffff,
-      text: this.props.children,
-      zIndex: 99999,
       parent: parent.node,
-      fontSize: 50,
+      text: this.props.children,
+      ...lightningTextNodeBuilder,
     });
 
     this.rendered = true;
+  }
+
+  delete() {
+    if (this.deleted) return;
+
+    if (this.node && isTextNode(this.node)) {
+      this.node.destroy();
+      this.deleted = true;
+    }
   }
 }
 
