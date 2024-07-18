@@ -5,59 +5,33 @@ import { type RendererSettings, startLightningRenderer } from './Lightning';
 import type { ElementContainer } from './types';
 
 import { RendererMain, SdfTrFontFace, TrFontFace, WebTrFontFace } from '@lightningjs/renderer';
-import type { fontData } from './types/LightningFonts';
+import type { CustomFonts } from './types/LightningFonts';
 
 let lightningRenderer: RendererMain | undefined;
-let LightningContext: React.Context<RendererMain>;
-let LightningProvider: React.FunctionComponent;
-let useLightning: () => RendererMain;
 
-let FontManagerContext: React.Context<WebTrFontFace | SdfTrFontFace<any> | any>;
-let useFontManager: () => void;
-let FontManagerProvider: React.FunctionComponent<{
-  fontData: fontData | undefined;
-  children?: React.ReactNode;
-}>;
-
-async function init(rootId: string | HTMLElement, settings?: RendererSettings) {
+async function init(rootId: string | HTMLElement, settings?: RendererSettings, customFonts?: CustomFonts) {
   const rootElement = typeof rootId === 'string' ? document.getElementById(rootId)! : rootId;
 
   lightningRenderer = startLightningRenderer(settings, rootElement);
   const lightning = lightningRenderer;
+  let fontManager!: TrFontFace;
 
-  LightningContext = React.createContext(lightning);
-  useLightning = () => React.useContext(LightningContext);
-
-  // eslint-disable-next-line react/display-name
-  LightningProvider = ({ children }: { children?: React.ReactNode }) => (
-    <LightningContext.Provider value={lightning}>{children}</LightningContext.Provider>
-  );
-
-  FontManagerContext = React.createContext(undefined);
-  useFontManager = () => React.useContext(FontManagerContext);
-  // eslint-disable-next-line react/display-name
-  FontManagerProvider = (props: { fontData: fontData | undefined; children?: React.ReactNode }) => {
-    let fontManager!: TrFontFace;
-
-    if (props.fontData) {
-      if (!lightningRenderer?.stage) {
-        throw new Error("Lightning renderer's stage not initialized.");
-      }
-
-      if (props.fontData.mode === 'webgl') {
-        fontManager = new SdfTrFontFace(props.fontData.type, {
-          stage: lightningRenderer?.stage,
-          ...props.fontData.options,
-        });
-      } else {
-        fontManager = new WebTrFontFace(props.fontData);
-      }
-
-      lightning.stage.fontManager.addFontFace(fontManager);
+  if (customFonts) {
+    if (!lightning?.stage) {
+      throw new Error('Lightning stage not initialized.');
     }
 
-    return <FontManagerContext.Provider value={fontManager}>{props.children}</FontManagerContext.Provider>;
-  };
+    if (customFonts.mode === 'webgl') {
+      fontManager = new SdfTrFontFace(customFonts.type, {
+        stage: lightning.stage,
+        ...customFonts.options,
+      });
+    } else {
+      fontManager = new WebTrFontFace(customFonts);
+    }
+
+    lightning.stage.fontManager.addFontFace(fontManager);
+  }
 }
 
 function render(element: React.ReactNode, callback?: () => void) {
@@ -69,27 +43,18 @@ function render(element: React.ReactNode, callback?: () => void) {
     type: 'ln-view',
     props: {},
     children: [],
-    node: undefined,
+    node: lightningRenderer.root,
     render: () => {
-      if (!lightningRenderer) return;
-
-      // Create the root node
-      rootNode.node = lightningRenderer.createNode({
-        parent: lightningRenderer.root,
-        width: lightningRenderer.root.width,
-        height: lightningRenderer.root.height,
-      });
+      rootNode.children.forEach((child) => child.render(rootNode));
     },
     delete: () => {
       rootNode.delete();
     },
   };
 
-  rootNode.render(rootNode);
-
   const container = DOMReconciler.createContainer(rootNode, ConcurrentRoot, null, false, null, '', console.error, null);
 
   DOMReconciler.updateContainer(element, container, null, callback);
 }
 
-export { LightningProvider, useLightning, useFontManager, FontManagerProvider, init, render };
+export { init, render };
