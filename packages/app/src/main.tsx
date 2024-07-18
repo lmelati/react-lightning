@@ -1,6 +1,6 @@
 import { type CustomFonts, init, render, type RendererSettings } from 'react-lightning';
-import App from './App';
-import './index.css';
+import App from './app';
+import './styles/global-styles.css';
 
 const basePath = import.meta.env.BASE_URL;
 
