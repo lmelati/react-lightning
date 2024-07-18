@@ -18,4 +18,5 @@ const config: RendererSettings = {
   deviceLogicalPixelRatio: logicalPixelRatio,
 };
 
+// eslint-disable-next-line react/react-in-jsx-scope
 init(document.getElementById('app')!, config).then(() => render(<App />));
