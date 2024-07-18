@@ -1,6 +1,6 @@
 import { type FontMetrics, type TrFontFaceDescriptors } from '@lightningjs/renderer';
 
-export type fontData =
+export type CustomFonts =
   | {
       mode: 'webgl';
       type: 'ssdf' | 'msdf';

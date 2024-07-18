@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import reconciler, { type HostConfig } from 'react-reconciler';
 import { DefaultEventPriority } from 'react-reconciler/constants';
 
@@ -20,21 +21,23 @@ const hostConfig: HostConfig<
   ElementContainer<any>, // Container
   Element<any>, // Instance
   Element<'ln-text'>, // TextInstance
-  any, // SuspenceInstance
-  any, // HydratableInstance
-  any, // PublicInstance
+  Element<any>, // SuspenceInstance
+  Element<any>, // HydratableInstance
+  void, // PublicInstance
   ContainerContext, // HostContext
   any, // UpdatePayload
   Element<any>[], // _ChildSet
-  any, // TimeoutHandle
+  number | undefined, // TimeoutHandle
   any // NoTimout
 > = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   now: Date.now,
   supportsMutation: false,
+  isPrimaryRenderer: false,
   supportsHydration: false,
   supportsPersistence: true,
+  noTimeout: -1,
 
   createContainerChildSet(): Element<any>[] {
     return [];
@@ -49,7 +52,7 @@ const hostConfig: HostConfig<
     childSet.push(child);
   },
   replaceContainerChildren(container: ElementContainer<any>, newChildren: Element<any>[]) {
-    // container.children.forEach((child) => child.delete())
+    container.children.forEach((child) => child.delete());
     container.children = newChildren;
   },
 
@@ -134,8 +137,21 @@ const hostConfig: HostConfig<
     return instance;
   },
 
-  prepareUpdate() {
-    // TODO check & return if we can need to create an entire new object or we can reuse the underlying skobject and use it as the payload in cloneInstance.
+  prepareUpdate() // instance: Element<any>,
+  // type: ElementType,
+  // oldProps: ElementProps<any>,
+  // newProps: ElementProps<any>,
+  // containerInfo,
+  // parentHostContext
+  {
+    // TODO check & return if we can need to create an entire new object or we can reuse the underlying object and use it as the payload in cloneInstance.
+    // console.log('prepareUpdate');
+    // console.log('instance', instance);
+    // console.log('type', type);
+    // console.log('oldProps', oldProps);
+    // console.log('newProps', newProps);
+    // console.log('containerInfo', containerInfo);
+    // console.log('parentHostContext', parentHostContext);
   },
 
   cloneInstance(
