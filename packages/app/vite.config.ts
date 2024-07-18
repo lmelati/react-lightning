@@ -1,8 +1,8 @@
-import path from "path";
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import path from 'path';
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-const isExternal = (id: string) => !id.startsWith(".") && !path.isAbsolute(id);
+const isExternal = (id: string) => !id.startsWith('.') && !path.isAbsolute(id);
 
 const getBaseConfig = ({ plugins = [react()], lib }) =>
   defineConfig({
@@ -16,7 +16,7 @@ const getBaseConfig = ({ plugins = [react()], lib }) =>
         external: isExternal,
         output: {
           globals: {
-            react: "React",
+            react: 'React',
           },
         },
       },
@@ -25,8 +25,8 @@ const getBaseConfig = ({ plugins = [react()], lib }) =>
 
 export default getBaseConfig({
   lib: {
-    entry: path.resolve(__dirname, "../react-lightning/dist/index.js"),
-    name: "React Lightning",
-    fileName: "react-lighhtning",
+    entry: path.resolve(__dirname, '../react-lightning/dist/index.js'),
+    name: 'React Lightning',
+    fileName: 'react-lighhtning',
   },
 });

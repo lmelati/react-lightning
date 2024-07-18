@@ -29,10 +29,10 @@ export const App: FunctionComponent = () => {
 
   return (
     <FontManagerProvider fontData={defaultWebGlFont}>
-      <ln-view ref={viewRef} width={1920} height={1080} color={0x000000ff}>
-        <ln-view x={10} y={20} width={500} height={500} color={0xff00ffff}>
-          <ln-text>Hello World!!!</ln-text>
-        </ln-view>
+      <ln-view ref={viewRef} width={1920} height={1080} color="#FF5566">
+        <ln-text color="#FFFFFF" fontSize={50} fontFamily="NotoSans">
+          Hello World!
+        </ln-text>
       </ln-view>
     </FontManagerProvider>
   );
