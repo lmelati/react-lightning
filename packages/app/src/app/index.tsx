@@ -1,8 +1,8 @@
 import type { FunctionComponent } from 'react';
-import { Home } from './pages/Home';
+import { HomePage } from './pages/Home';
 
 export const App: FunctionComponent = () => {
-  return <Home />;
+  return <HomePage />;
 };
 
 export default App;
