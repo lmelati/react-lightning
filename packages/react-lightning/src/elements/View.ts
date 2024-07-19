@@ -33,7 +33,7 @@ export class View implements Element<'ln-view'> {
       throw new Error('Parent is not a node element');
     }
 
-    const lightningNodeBuilder = toLightningNode(this.props);
+    const lightningNodeBuilder = toLightningNode(this.props, parent);
 
     this.node = renderer.createNode({
       parent: parent.node,

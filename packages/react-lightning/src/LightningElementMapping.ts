@@ -1,20 +1,40 @@
 import type { INodeProps, ITextNodeProps } from '@lightningjs/renderer';
-import type { Color, TextStyle, ViewStyle } from './types';
+import type { Color, ElementContainer, TextStyle, ViewStyle } from './types';
+import { hexColorTransform } from './utils';
 
 export interface PropsConverter<IN, OUT> {
-  (propIn?: IN): OUT | undefined;
+  (propIn?: IN, parent?: ElementContainer<any>): OUT | undefined;
 }
 
 export const toLightningColor: PropsConverter<Color | string, number> = (color) => {
   if (typeof color === 'string' && color.startsWith('#')) {
-    return Number(color.replace('#', '0x') + (color.length === 7 ? 'ff' : ''));
+    return hexColorTransform(color);
   } else {
-    console.log('Todo: Convert Color', color);
+    // Default color to transparent
     return 0x00000000;
   }
 };
 
-export const toLightningNode: PropsConverter<ViewStyle, Omit<Partial<INodeProps>, 'shader' | 'parent'>> = (view) => {
+export const toLightningNode: PropsConverter<ViewStyle, Omit<Partial<INodeProps>, 'shader' | 'parent'>> = (
+  view,
+  parent
+) => {
+  let customWidth = view?.width;
+  let customHeight = view?.height;
+
+  if (parent && view && !view.texture) {
+    const { width: parentWidth = 0, height: parentHeight = 0 } = parent.props;
+    const { width, height, x = 0, y = 0 } = view;
+
+    if (!width || isNaN(width)) {
+      customWidth = parentWidth - x;
+    }
+
+    if (!height || isNaN(height)) {
+      customHeight = parentHeight - y;
+    }
+  }
+
   return {
     color: toLightningColor(view?.color),
     x: view?.x,
@@ -30,7 +50,8 @@ export const toLightningNode: PropsConverter<ViewStyle, Omit<Partial<INodeProps>
     colorTl: view?.colorTl,
     colorTop: view?.colorTop,
     colorTr: view?.colorTr,
-    height: view?.height,
+    width: customWidth,
+    height: customHeight,
     mount: view?.mount,
     mountX: view?.mountX,
     mountY: view?.mountY,
@@ -45,7 +66,6 @@ export const toLightningNode: PropsConverter<ViewStyle, Omit<Partial<INodeProps>
     src: view?.src,
     texture: view?.texture,
     textureOptions: view?.textureOptions,
-    width: view?.width,
     zIndex: view?.zIndex,
     zIndexLocked: view?.zIndexLocked,
   };
