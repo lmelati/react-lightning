@@ -43,6 +43,10 @@ const hostConfig: HostConfig<
     return [];
   },
 
+  detachDeletedInstance(instance) {
+    instance.delete();
+  },
+
   /**
    * Attaches new children to the set returned by createContainerChildSet
    * @param childSet
@@ -137,13 +141,13 @@ const hostConfig: HostConfig<
     return instance;
   },
 
-  prepareUpdate() // instance: Element<any>,
-  // type: ElementType,
-  // oldProps: ElementProps<any>,
-  // newProps: ElementProps<any>,
-  // containerInfo,
-  // parentHostContext
-  {
+  prepareUpdate() {
+    // instance: Element<any>,
+    // type: ElementType,
+    // oldProps: ElementProps<any>,
+    // newProps: ElementProps<any>,
+    // containerInfo,
+    // parentHostContext
     // TODO check & return if we can need to create an entire new object or we can reuse the underlying object and use it as the payload in cloneInstance.
     // console.log('prepareUpdate');
     // console.log('instance', instance);
