@@ -44,11 +44,20 @@ export interface EffectsProperties {
   radialProgress?: RadialProgressEffectProperties;
 }
 
-export interface FlexProperties
-  extends Pick<CSSProperties, 'alignItems' | 'justifyContent' | 'flexDirection' | 'gap'> {}
+export interface FlexProperties {
+  alignItems?: 'flex-start' | 'flex-end' | 'center';
+  justifyContent?: 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly';
+  flexDirection?: 'row' | 'column';
+  flexBoundary?: 'fixed' | 'contain';
+  gap?: number;
+}
 
-export interface MarginProperties
-  extends Pick<CSSProperties, 'marginTop' | 'marginRight' | 'marginBottom' | 'marginLeft'> {}
+export interface MarginProperties {
+  marginTop?: number;
+  marginRight?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+}
 
 export interface BorderProperties
   extends Pick<CSSProperties, 'border' | 'borderTop' | 'borderRight' | 'borderBottom' | 'borderLeft'> {}
@@ -66,7 +75,23 @@ export interface ViewStyleProperties
   linearGradient?: LinearGradientProperties;
 }
 
-export interface TextStyle extends Omit<Partial<ITextNodeProps>, 'text' | 'debug' | 'color'> {
+export interface TextStyle
+  extends Omit<
+      Partial<ITextNodeProps>,
+      | 'textRendererOverride'
+      | 'text'
+      | 'src'
+      | 'zIndexLocked'
+      | 'shader'
+      | 'parent'
+      | 'rtt'
+      | 'debug'
+      | 'color'
+      | 'autosize'
+      | 'texture'
+      | 'textureOptions'
+    >,
+    MarginProperties {
   color?: Color | string;
 }
 
@@ -87,12 +112,21 @@ export type ElementType = keyof ObjectTyping;
 
 export interface Element<TypeName extends keyof ObjectTyping> {
   readonly type: TypeName;
+
   props: ObjectTyping[TypeName]['props'];
   node: (INode<any> | ITextNode) | undefined;
 
   render(parent: ElementContainer<any>): void;
 
+  layoutUpdate(): void;
+
+  needsLayoutUpdate(): boolean;
+
   delete(): void;
+
+  get style(): ObjectTyping[TypeName]['props']['style'];
+
+  set style(style: ObjectTyping[TypeName]['props']['style']);
 }
 
 export interface ElementCreator<TypeName extends keyof ObjectTyping> {
