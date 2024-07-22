@@ -22,16 +22,15 @@ export const toLightningNode: PropsConverter<ViewStyle, Omit<Partial<INodeProps>
   let customWidth = view?.width;
   let customHeight = view?.height;
 
-  if (parent && view && !view.texture) {
-    const { width: parentWidth = 0, height: parentHeight = 0 } = parent.props;
-    const { width, height, x = 0, y = 0 } = view;
+  if (parent && parent.style && view && !view.texture) {
+    const { width: parentWidth = 0, height: parentHeight = 0 } = parent.style;
 
-    if (!width || isNaN(width)) {
-      customWidth = parentWidth - x;
+    if (!customWidth || isNaN(customWidth)) {
+      customWidth = parentWidth - Number(view?.x) || 0;
     }
 
-    if (!height || isNaN(height)) {
-      customHeight = parentHeight - y;
+    if (!customHeight || isNaN(customHeight)) {
+      customHeight = parentHeight - Number(view?.y) || 0;
     }
   }
 

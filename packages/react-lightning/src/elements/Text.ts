@@ -5,13 +5,17 @@ import { isView } from './View';
 import { isTextNode } from '../utils';
 import { toLightningTextNode } from '../LightningElementMapping';
 
-export interface TextProps extends TextStyle, ElementProps<Text> {
+export interface TextProps extends ElementProps<Text> {
+  style?: TextStyle | undefined;
   children: string;
 }
 
 export class Text implements Element<'ln-text'> {
   readonly type = 'ln-text' as const;
-  readonly props: ObjectTyping['ln-text']['props'];
+
+  private _parent: ElementContainer<any> | undefined;
+
+  props: ObjectTyping['ln-text']['props'];
   node: ITextNode | undefined;
 
   rendered = false;
@@ -21,33 +25,68 @@ export class Text implements Element<'ln-text'> {
     this.props = props;
   }
 
-  render(parent?: ElementContainer<any>): void {
-    if (!parent || !isView(parent)) {
-      throw new Error('Parent is not a view');
+  private checkIfDeleted(): void {
+    if (this.deleted) {
+      throw new Error('View element deleted.');
     }
+  }
 
-    if (!parent.rendered) {
-      throw new Error('Parent not rendered');
-    }
-
-    const lightningTextNodeBuilder = toLightningTextNode(this.props);
-
+  private createRenderNode(parent: ElementContainer<any>): void {
+    const lightningTextNodeBuilder = toLightningTextNode(this.style);
     this.node = renderer.createTextNode({
       parent: parent.node,
       text: this.props.children,
       ...lightningTextNodeBuilder,
     });
-
     this.rendered = true;
   }
 
+  render(parent?: ElementContainer<any>): void {
+    this.checkIfDeleted();
+
+    if (!parent || !isView(parent)) {
+      throw new Error('Parent is not a view');
+    }
+
+    queueMicrotask(() => {
+      this.createRenderNode(parent);
+    });
+  }
+
   delete() {
-    if (this.deleted) return;
+    this.checkIfDeleted();
 
     if (this.node && isTextNode(this.node)) {
       this.node.destroy();
       this.deleted = true;
     }
+  }
+
+  needsLayoutUpdate() {
+    return false; // this.onBeforeLayout;
+  }
+
+  layoutUpdate() {
+    // noop
+  }
+
+  get parent() {
+    return this._parent;
+  }
+
+  set parent(parent) {
+    this._parent = parent;
+    if (this.rendered && this.node) {
+      this.node.parent = parent?.node?.parent ?? null;
+    }
+  }
+
+  get style() {
+    return this.props.style || {};
+  }
+
+  set style(style: TextStyle) {
+    this.props.style = style;
   }
 }
 

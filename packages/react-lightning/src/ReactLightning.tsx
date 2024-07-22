@@ -44,6 +44,11 @@ function render(element: React.ReactNode, callback?: () => void) {
     props: {},
     children: [],
     node: lightningRenderer.root,
+    layoutUpdate: () => {
+      /* noop */
+    },
+    needsLayoutUpdate: () => false,
+    style: {},
     render: () => {
       rootNode.children.forEach((child) => child.render(rootNode));
     },

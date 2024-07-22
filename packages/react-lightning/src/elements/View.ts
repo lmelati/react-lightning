@@ -4,18 +4,26 @@ import type { Element, ElementContainer, ElementCreator, ElementProps, ObjectTyp
 import { type ReactNode } from 'react';
 import { isNode } from '../utils';
 import { toLightningNode } from '../LightningElementMapping';
+import { toFlexbox } from '../LightningElementAdapter';
 
-export interface ViewProps extends ViewStyle, ElementProps<View> {
+let queueLayout: boolean = true;
+const layoutQueue: Set<ElementContainer<any>> = new Set();
+
+export interface ViewProps extends ElementProps<View> {
+  style?: ViewStyle | undefined;
   children?: ReactNode;
 }
 
 type TvViewChild = Element<'ln-view'> | Element<'ln-text'>;
 
 export class View implements Element<'ln-view'> {
-  props: ObjectTyping['ln-view']['props'];
   readonly type = 'ln-view' as const;
-  children: TvViewChild[] = [];
+
+  private _parent: ElementContainer<any> | undefined;
+
+  props: ObjectTyping['ln-view']['props'];
   node: INode<any> | undefined;
+  children: TvViewChild[] = [];
 
   rendered = false;
   deleted = false;
@@ -24,27 +32,59 @@ export class View implements Element<'ln-view'> {
     this.props = props;
   }
 
-  render(parent: ElementContainer<any>): void {
+  private checkIfDeleted(): void {
     if (this.deleted) {
-      throw new Error('view element deleted.');
+      throw new Error('View element deleted.');
     }
+  }
 
-    if (!parent.node || !isNode(parent.node)) {
-      throw new Error('Parent is not a node element');
+  private addToLayoutQueueIfNeeded(parent: ElementContainer<any>): void {
+    if (parent.needsLayoutUpdate() && !layoutQueue.has(parent)) {
+      layoutQueue.add(parent);
+
+      if (queueLayout) {
+        this.processLayoutQueue();
+      }
     }
+  }
 
-    const lightningNodeBuilder = toLightningNode(this.props, parent);
+  private processLayoutQueue(): void {
+    queueLayout = false;
+    queueMicrotask(() => {
+      queueLayout = true;
+      const queue = [...layoutQueue];
+      layoutQueue.clear();
+      for (let i = queue.length - 1; i >= 0; i--) {
+        queue[i]!.layoutUpdate();
+      }
+    });
+  }
 
+  private createRenderNode(parent: ElementContainer<any>): void {
+    const lightningNodeBuilder = toLightningNode(this.style, parent);
     this.node = renderer.createNode({
       parent: parent.node,
       ...lightningNodeBuilder,
     });
     this.rendered = true;
+  }
+
+  private renderChildren(): void {
     this.children.forEach((child) => child.render(this));
   }
 
+  render(parent: ElementContainer<any>): void {
+    this.checkIfDeleted();
+    this.addToLayoutQueueIfNeeded(parent);
+
+    queueMicrotask(() => {
+      this.createRenderNode(parent);
+      this.renderChildren();
+    });
+  }
+
   delete() {
-    if (this.deleted) return;
+    this.checkIfDeleted();
 
     if (this.node && isNode(this.node)) {
       this.node.destroy();
@@ -52,8 +92,41 @@ export class View implements Element<'ln-view'> {
     }
   }
 
+  needsLayoutUpdate() {
+    return this.style.display === 'flex'; // || this.onBeforeLayout;
+  }
+
+  layoutUpdate() {
+    if (this.hasChildren) {
+      if (this.style.display === 'flex') {
+        if (toFlexbox(this)) {
+          this.parent?.layoutUpdate();
+        }
+      }
+    }
+  }
+
   get hasChildren() {
     return this.children.length > 0;
+  }
+
+  get parent() {
+    return this._parent;
+  }
+
+  set parent(parent) {
+    this._parent = parent;
+    if (this.rendered && this.node) {
+      this.node.parent = parent?.node?.parent || null;
+    }
+  }
+
+  get style() {
+    return this.props.style || {};
+  }
+
+  set style(style: ViewStyle) {
+    this.props.style = style;
   }
 }
 
